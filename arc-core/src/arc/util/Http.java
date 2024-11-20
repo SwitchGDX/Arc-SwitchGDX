@@ -242,79 +242,79 @@ public class Http{
 
         /** Blocks until this request is done. */
         public void block(ConsT<HttpResponse, Exception> success){
-            if(url == null){
-                errorHandler.get(new ArcRuntimeException("can't process a HTTP request without URL set"));
-                return;
-            }
-
-            try{
-                URL url;
-
-                if(method == HttpMethod.GET){
-                    String queryString = "";
-                    String value = content;
-                    if(value != null && !"".equals(value)) queryString = "?" + value;
-                    url = new URL(this.url + queryString);
-                }else{
-                    url = new URL(this.url);
-                }
-
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                //should be enabled to upload data.
-                boolean doingOutPut = method == HttpMethod.POST || method == HttpMethod.PUT;
-                connection.setDoOutput(doingOutPut);
-                connection.setDoInput(true);
-                connection.setRequestMethod(method.toString());
-                HttpURLConnection.setFollowRedirects(followRedirects);
-
-                //set headers
-                headers.each(connection::addRequestProperty);
-
-                //timeouts
-                connection.setConnectTimeout(timeout);
-                connection.setReadTimeout(timeout);
-
-                try{
-                    // Set the content for POST and PUT (GET has the information embedded in the URL)
-                    if(doingOutPut){
-                        // we probably need to use the content as stream here instead of using it as a string.
-                        if(content != null){
-                            try(OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Strings.utf8)){
-                                writer.write(content);
-                            }
-                        }else{
-                            if(contentStream != null){
-                                try(OutputStream os = connection.getOutputStream()){
-                                    Streams.copy(contentStream, os);
-                                }
-                            }
-                        }
-                    }
-
-                    connection.connect();
-
-                    try{
-                        int code = connection.getResponseCode();
-
-                        //4xx or 5xx error
-                        if(code >= 400){
-                            HttpStatus status = HttpStatus.byCode(code);
-                            errorHandler.get(new HttpStatusException("HTTP request failed with error: " + code + " (" + status + ", URL = " + url + ")", status, new HttpResponse(connection)));
-                        }else{
-                            success.get(new HttpResponse(connection));
-                        }
-
-                    }finally{
-                        connection.disconnect();
-                    }
-
-                }catch(Throwable e){
-                    connection.disconnect();
-                    errorHandler.get(e);
-                }
-            }catch(Throwable e){
-                errorHandler.get(e);
-            }
+//            if(url == null){
+//                errorHandler.get(new ArcRuntimeException("can't process a HTTP request without URL set"));
+//                return;
+//            }
+//
+//            try{
+//                URL url;
+//
+//                if(method == HttpMethod.GET){
+//                    String queryString = "";
+//                    String value = content;
+//                    if(value != null && !"".equals(value)) queryString = "?" + value;
+//                    url = new URL(this.url + queryString);
+//                }else{
+//                    url = new URL(this.url);
+//                }
+//
+//                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+//                //should be enabled to upload data.
+//                boolean doingOutPut = method == HttpMethod.POST || method == HttpMethod.PUT;
+//                connection.setDoOutput(doingOutPut);
+//                connection.setDoInput(true);
+//                connection.setRequestMethod(method.toString());
+//                HttpURLConnection.setFollowRedirects(followRedirects);
+//
+//                //set headers
+//                headers.each(connection::addRequestProperty);
+//
+//                //timeouts
+//                connection.setConnectTimeout(timeout);
+//                connection.setReadTimeout(timeout);
+//
+//                try{
+//                    // Set the content for POST and PUT (GET has the information embedded in the URL)
+//                    if(doingOutPut){
+//                        // we probably need to use the content as stream here instead of using it as a string.
+//                        if(content != null){
+//                            try(OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Strings.utf8)){
+//                                writer.write(content);
+//                            }
+//                        }else{
+//                            if(contentStream != null){
+//                                try(OutputStream os = connection.getOutputStream()){
+//                                    Streams.copy(contentStream, os);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    connection.connect();
+//
+//                    try{
+//                        int code = connection.getResponseCode();
+//
+//                        //4xx or 5xx error
+//                        if(code >= 400){
+//                            HttpStatus status = HttpStatus.byCode(code);
+//                            errorHandler.get(new HttpStatusException("HTTP request failed with error: " + code + " (" + status + ", URL = " + url + ")", status, new HttpResponse(connection)));
+//                        }else{
+//                            success.get(new HttpResponse(connection));
+//                        }
+//
+//                    }finally{
+//                        connection.disconnect();
+//                    }
+//
+//                }catch(Throwable e){
+//                    connection.disconnect();
+//                    errorHandler.get(e);
+//                }
+//            }catch(Throwable e){
+//                errorHandler.get(e);
+//            }
         }
     }
 

@@ -1,6 +1,7 @@
 package arc.util.io;
 
 import java.io.*;
+import java.lang.reflect.Field;
 
 /** A wrapper for DataInput with more concise method names and no IOExceptions. */
 public class Reads implements Closeable{
@@ -15,6 +16,16 @@ public class Reads implements Closeable{
     public static Reads get(DataInput input){
         instance.input = input;
         return instance;
+    }
+    
+    public int count() {
+        try {
+            Field field = FilterInputStream.class.getDeclaredField("in");
+            field.setAccessible(true);
+            return ((CounterInputStream)field.get(input)).count;
+        } catch (Exception ex) {
+            return 0;
+        }
     }
 
     /** @return -1 if EOF or unsupported, or the next byte. */
