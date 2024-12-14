@@ -1,6 +1,7 @@
 package arc.backend.switchgdx;
 
 import arc.Input;
+import arc.input.InputDevice;
 import arc.input.InputProcessor;
 import arc.input.KeyCode;
 
@@ -10,9 +11,10 @@ public class SwitchInput extends Input {
     
     private static final KeyCode[] SWITCH_KEYS = {
         KeyCode.controllerA, KeyCode.controllerB, KeyCode.controllerX, KeyCode.controllerY,
-        KeyCode.dpadUp, KeyCode.dpadDown, KeyCode.dpadLeft, KeyCode.dpadRight,
-        KeyCode.buttonThumbL, KeyCode.buttonThumbR, KeyCode.buttonSelect, KeyCode.buttonStart,
-        KeyCode.buttonL1, KeyCode.buttonL2, KeyCode.buttonR1, KeyCode.buttonR2,
+        KeyCode.buttonThumbL, KeyCode.buttonThumbR,
+        KeyCode.buttonL1, KeyCode.buttonR1, KeyCode.buttonL2, KeyCode.buttonR2,
+        KeyCode.escape, KeyCode.buttonStart,
+        KeyCode.a, KeyCode.w, KeyCode.d, KeyCode.s, 
     };
 
     private long currentEventTimeStamp;
@@ -25,6 +27,8 @@ public class SwitchInput extends Input {
     private final int[] deltaY = new int[MAX_TOUCHES];
     private final boolean[] touched = new boolean[MAX_TOUCHES];
     private boolean wasJustTouched;
+    private int prevButtons;
+    private final float[] axes = new float[4];
 
     public SwitchInput () {
         for (int i = 0; i < MAX_TOUCHES; i++) {
@@ -101,14 +105,26 @@ public class SwitchInput extends Input {
 
         System.arraycopy(touchData, 0, previousTouchData, 0, MAX_TOUCHES * 3);
 
-//        SwitchController currentController = (SwitchController)SwitchControllerManager.getInstance().getCurrentController();
-//        for (int key: SWITCH_KEYS) {
-//            int button = keyToButton(key);
-//            if (currentController.getButtonPressed(button) && inputProcessor != null)
-//                inputProcessor.keyDown(key);
-//            if (currentController.getButtonReleased(button) && inputProcessor != null)
-//                inputProcessor.keyUp(key);
-//        }
+        int buttons = getButtons(-1);
+        getAxes(-1, axes);
+        if (Math.abs(axes[0]) > 0.1f)
+            buttons |= axes[0] < 0 ? 1 << 12 : 1 << 14;
+        if (Math.abs(axes[1]) > 0.1f)
+            buttons |= axes[1] < 0 ? 1 << 13 : 1 << 15;
+        for (int i = 0; i < 16; i++) {
+            int bit = 1 << i;
+            if ((buttons & bit) != 0 && (prevButtons & bit) == 0)
+                inputMultiplexer.keyDown(SWITCH_KEYS[i]);
+            else if ((buttons & bit) == 0 && (prevButtons & bit) != 0)
+                inputMultiplexer.keyUp(SWITCH_KEYS[i]);
+        }
+        prevButtons = buttons;
+    }
+
+    void processDevices(){
+        for (InputDevice device : devices) {
+            device.postUpdate();
+        }
     }
     
     @Override
@@ -180,4 +196,12 @@ public class SwitchInput extends Input {
     public native void getTextInput(TextInput input);
     
     private static native void getTouchData(int[] touchData);
+    
+    private static native int getButtons(int controller);
+
+    private static native void getAxes(int controller, float[] axes);
+    
+    private static native boolean isConnected(int controller);
+    
+    private static native void remapControllers(int min, int max, boolean dualJoy, boolean singleMode);
 }

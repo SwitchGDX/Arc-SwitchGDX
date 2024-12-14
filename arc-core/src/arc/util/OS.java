@@ -27,6 +27,7 @@ public class OS{
     public static boolean isMac = propNoNull("os.name").contains("Mac");
     public static boolean isIos = false;
     public static boolean isAndroid = false;
+    public static boolean isSwitchGdx = propNoNull("os.name").contains("horizon") || propNoNull("os.name").contains("uwp") || propNoNull("os.name").contains("unknown");
     public static boolean isARM = propNoNull("os.arch").startsWith("arm") || propNoNull("os.arch").startsWith("aarch64");
     public static boolean is64Bit = propNoNull("os.arch").contains("64") || propNoNull("os.arch").startsWith("armv8");
 

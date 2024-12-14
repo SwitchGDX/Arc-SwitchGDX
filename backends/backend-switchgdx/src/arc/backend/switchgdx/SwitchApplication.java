@@ -50,15 +50,11 @@ public class SwitchApplication implements Application {
                 }
 
                 graphics.update();
-//                audio.update(graphics.getDeltaTime());
                 input.update();
-//                controllerManager.update();
-//                Timer.instance().update();
                 defaultUpdate();
                 listen(ApplicationListener::update);
                 runnables.run();
-                
-//                System.gc();
+                input.processDevices();
             }
         } catch (Throwable t) {
             System.out.println("Uncaught Exception:");
@@ -83,7 +79,7 @@ public class SwitchApplication implements Application {
 
     @Override
     public ApplicationType getType() {
-        return ApplicationType.android;
+        return ApplicationType.switchGdx;
     }
 
     @Override
@@ -113,6 +109,9 @@ public class SwitchApplication implements Application {
         }
     }
 
+    @Override
+    public native boolean openURI(String URI);
+
     private static native void init(boolean vsync);
 
     private static native boolean update();
@@ -122,19 +121,12 @@ public class SwitchApplication implements Application {
     public static class Config {
 
         private boolean vsync = true;
-
-        private ApplicationType appType = ApplicationType.android;
-
+        
         public Config() {
         }
 
         public Config(boolean vsync) {
             this.vsync = vsync;
-        }
-
-        public Config(boolean vsync, ApplicationType appType) {
-            this.vsync = vsync;
-            this.appType = appType;
         }
 
         public boolean getVsync() {
@@ -143,14 +135,6 @@ public class SwitchApplication implements Application {
 
         public void setVsync(boolean vsync) {
             this.vsync = vsync;
-        }
-
-        public ApplicationType getAppType() {
-            return appType;
-        }
-
-        public void setAppType(ApplicationType appType) {
-            this.appType = appType;
         }
     }
 }

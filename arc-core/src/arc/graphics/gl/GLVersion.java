@@ -17,6 +17,7 @@ public class GLVersion{
     public GLVersion(Application.ApplicationType appType, String versionString, String vendorString, String rendererString){
         if(appType == Application.ApplicationType.android) this.type = GlType.GLES;
         else if(appType == Application.ApplicationType.iOS) this.type = GlType.GLES;
+        else if(appType == Application.ApplicationType.switchGdx) this.type = GlType.GLES;
         else if(appType == Application.ApplicationType.desktop) this.type = GlType.OpenGL;
         else if(appType == Application.ApplicationType.web) this.type = GlType.WebGL;
         else this.type = GlType.NONE;

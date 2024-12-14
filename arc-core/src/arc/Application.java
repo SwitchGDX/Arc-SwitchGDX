@@ -51,8 +51,12 @@ public interface Application extends Disposable{
         return getType() == ApplicationType.iOS;
     }
 
+    default boolean isSwitchGdx(){
+        return getType() == ApplicationType.switchGdx;
+    }
+
     default boolean isMobile(){
-        return isAndroid() || isIOS();
+        return isAndroid() || isIOS() || isSwitchGdx();
     }
 
     default boolean isWeb(){
@@ -125,6 +129,6 @@ public interface Application extends Disposable{
 
     /** Enumeration of possible {@link Application} types */
     enum ApplicationType{
-        android, desktop, headless, web, iOS
+        android, desktop, headless, web, iOS, switchGdx
     }
 }
